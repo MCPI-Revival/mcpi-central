@@ -1,0 +1,3 @@
+# Python stuff
+*.pyc
+__pycache__/
