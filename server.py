@@ -19,7 +19,9 @@ class APIHandler(APIServer):
 			"/auth": ["code"],
 			"/servers/new": ["token", "name", "ip", "port"],
 			"/user": ["token"],
-			"/server": ["name"]
+			"/server": ["name"],
+			"/servers": [],
+			"/servers/update": ["token", "name", "ip", "port"]
 		};
 
 	def get_token(self, code):
@@ -84,20 +86,32 @@ class APIHandler(APIServer):
 					"port": int(query["port"][0]),
 					"owner": user
 				});
+			elif url.path == "/servers/update":
+				user = self.get_user(query["token"][0])["id"];
+				if self.db.get_server(query["name"][0])["owner"] == user:
+					self.db.update_server(query["name"][0], query["ip"][0], int(query["port"][0]));
+					reply = self.decode_json({
+						"name": query["name"][0],
+						"ip": query["ip"][0],
+						"port": int(query["port"][0]),
+						"owner": user
+					});
+				else:
+					code = 404;
+					reply = self.__err;
+			elif url.path == "/servers":
+				servers = self.db.get_servers();
+				if servers is not None:
+					reply = self.decode_json({
+						"servers": servers
+					});
 			elif url.path == "/server":
 				server = self.db.get_server(query["name"][0]);
 				if server is not None:
-					reply = self.decode_json({
-						"name": server[0],
-						"ip": server[1],
-						"port": server[2],
-						"owner": server[3]
-					});
+					reply = self.decode_json(server);
 				else:
+					code = 404;
 					reply = self.__err;
-			else:
-				reply = self.__err;
-				code = 404;
 		else:
 			reply = self.__err;
 			code = 404;

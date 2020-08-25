@@ -14,22 +14,35 @@ class APIClient(APIServer):
 		self.__err = """{\n\t"error": "Not found."\n}""";
 		self.token = None;
 		self.stop = False;
-		self.server = environ.get("AUTH_SERVER") or "https://mcpi-devs.herokuapp.com";
+		self.auth_server = environ.get("AUTH_SERVER") or "https://mcpi-devs.herokuapp.com";
+		print(self.auth_server);
 
 	def get_token(self, code):
-		res = requests.get(f"""{self.server}/auth?code={code}""");
+		res = requests.get(f"""{self.auth_server}/auth?code={code}""");
 		res.raise_for_status();
 		return res.json();
 
 	def new_server(self, name, ip, port):
 		if self.token is None:
 			return -1;
-		res = requests.get(f"""{self.server}/servers/new?token={self.token}&ip={ip}&port={port}&name={name}""");
+		res = requests.get(f"""{self.auth_server}/servers/new?token={self.token}&ip={ip}&port={port}&name={name}""");
+		res.raise_for_status();
+		return res.json();
+
+	def update_server(self, name, ip, port):
+		if self.token is None:
+			return -1;
+		res = requests.get(f"""{self.auth_server}/servers/update?token={self.token}&ip={ip}&port={port}&name={name}""");
 		res.raise_for_status();
 		return res.json();
 
 	def get_server(self, name):
-		res = requests.get(f"""{self.server}/server?name={name}""");
+		res = requests.get(f"""{self.auth_server}/server?name={name}""");
+		res.raise_for_status();
+		return res.json();
+
+	def get_servers(self, name):
+		res = requests.get(f"""{self.auth_server}/servers""");
 		res.raise_for_status();
 		return res.json();
 
@@ -67,6 +80,9 @@ class APIClient(APIServer):
 def main():
 	client = APIClient();
 	client.login();
+	client.new_server("StevePi", "127.0.0.1", 19132);
+	print(client.get_server("StevePi"));
+	client.update_server("StevePi", "127.0.1.1", 19139);
 	print(client.get_server("StevePi"));
 	return 0;
 
