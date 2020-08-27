@@ -1,4 +1,25 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#  server.py
+#  
+#  Copyright 2020 Alvarito050506 <donfrutosgomez@gmail.com>
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; version 2 of the License.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#  
+#  
 
 import sys
 import json
@@ -7,13 +28,13 @@ import urllib.request
 import requests
 from os import environ
 from urllib.parse import urlparse, parse_qs
-from db import *
-from base import *
+from .db import *
+from .base import *
 
-class APIHandler(APIServer):
-	def __init__(self):
+class APIServer(APIBaseServer):
+	def __init__(self, id, secret, client, db_url):
 		self.__err = """{\n\t"error": "Not found."\n}""";
-		self.db = DBData();
+		self.db = DBData(db_url);
 		self.db.setup();
 		self.paths = {
 			"/auth": ["code"],
@@ -23,14 +44,17 @@ class APIHandler(APIServer):
 			"/servers": [],
 			"/servers/update": ["token", "name", "ip", "port"]
 		};
+		self.id = id;
+		self.secret = secret;
+		self.client = client;
 
 	def get_token(self, code):
 		data = {
-			"client_id": environ.get("CLIENT_ID"),
-			"client_secret": environ.get("CLIENT_SECRET"),
+			"client_id": self.id,
+			"client_secret": self.secret,
 			"grant_type": "authorization_code",
 			"code": code,
-			"redirect_uri": environ.get("AUTH_CLIENT"),
+			"redirect_uri": self.client,
 			"scope": "identify email"
 		};
 		headers = {
@@ -54,8 +78,9 @@ class APIHandler(APIServer):
 		url = urlparse(self.path);
 		query = parse_qs(url.query);
 
-		self.server_version = "MCPI API";
+		self.server_version = "MCPI-Central API";
 		self.sys_version = "";
+
 
 		try:
 			self.paths[url.path];
@@ -71,26 +96,28 @@ class APIHandler(APIServer):
 			return 0;
 
 		if self.require_args(self.paths[url.path], query):
+			token = self.headers.get("Authorization");
+
 			if url.path == "/auth":
-				reply = self.decode_json({
+				reply = self.encode_json({
 					"token": self.get_token(query["code"][0])["access_token"]
 				});
 			elif url.path == "/user":
-				reply = self.decode_json(self.get_user(query["token"][0]));
+				reply = self.encode_json(self.get_user(token));
 			elif url.path == "/servers/new":
-				user = self.get_user(query["token"][0])["id"];
+				user = self.get_user(token)["id"];
 				self.db.add_server(query["name"][0], query["ip"][0], int(query["port"][0]), user);
-				reply = self.decode_json({
+				reply = self.encode_json({
 					"name": query["name"][0],
 					"ip": query["ip"][0],
 					"port": int(query["port"][0]),
 					"owner": user
 				});
 			elif url.path == "/servers/update":
-				user = self.get_user(query["token"][0])["id"];
+				user = self.get_user(token)["id"];
 				if self.db.get_server(query["name"][0])["owner"] == user:
 					self.db.update_server(query["name"][0], query["ip"][0], int(query["port"][0]));
-					reply = self.decode_json({
+					reply = self.encode_json({
 						"name": query["name"][0],
 						"ip": query["ip"][0],
 						"port": int(query["port"][0]),
@@ -101,14 +128,20 @@ class APIHandler(APIServer):
 					reply = self.__err;
 			elif url.path == "/servers":
 				servers = self.db.get_servers();
+				server_arr = list();
 				if servers is not None:
-					reply = self.decode_json({
-						"servers": servers
+					for server in servers:
+						server_arr.append(server["name"]);
+					reply = self.encode_json({
+						"servers": server_arr
 					});
+				else:
+					code = 404;
+					reply = self.__err;
 			elif url.path == "/server":
 				server = self.db.get_server(query["name"][0]);
 				if server is not None:
-					reply = self.decode_json(server);
+					reply = self.encode_json(server);
 				else:
 					code = 404;
 					reply = self.__err;
@@ -124,8 +157,8 @@ class APIHandler(APIServer):
 		self.wfile.write("\n".encode());
 		return 0;
 
-def mcpi_api_server():
-	handler = APIHandler();
+def mcpi_central_server(id, secret, client, db_url):
+	handler = APIServer(id, secret, client, db_url);
 	server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT"))), handler);
 	try:
 		server.serve_forever();
@@ -133,6 +166,3 @@ def mcpi_api_server():
 		handler.db.close();
 		print();
 		return 0;
-
-if __name__ == '__main__':
-	sys.exit(mcpi_api_server());

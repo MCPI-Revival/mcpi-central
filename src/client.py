@@ -1,4 +1,25 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#  client.py
+#  
+#  Copyright 2020 Alvarito050506 <donfrutosgomez@gmail.com>
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; version 2 of the License.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#  
+#  
 
 import sys
 import json
@@ -7,15 +28,14 @@ import urllib.request
 import requests
 from os import environ
 from urllib.parse import urlparse, parse_qs
-from base import *
+from .base import *
 
-class APIClient(APIServer):
-	def __init__(self):
+class APIClient(APIBaseServer):
+	def __init__(self, auth_server):
 		self.__err = """{\n\t"error": "Not found."\n}""";
 		self.token = None;
 		self.stop = False;
-		self.auth_server = environ.get("AUTH_SERVER") or "https://mcpi-devs.herokuapp.com";
-		print(self.auth_server);
+		self.auth_server = auth_server or "https://mcpi-devs.herokuapp.com";
 
 	def get_token(self, code):
 		res = requests.get(f"""{self.auth_server}/auth?code={code}""");
@@ -25,14 +45,21 @@ class APIClient(APIServer):
 	def new_server(self, name, ip, port):
 		if self.token is None:
 			return -1;
-		res = requests.get(f"""{self.auth_server}/servers/new?token={self.token}&ip={ip}&port={port}&name={name}""");
+		headers = {
+			"Authorization": self.token
+		};
+		res = requests.get(f"""{self.auth_server}/servers/new?ip={ip}&port={port}&name={name}""", headers=headers);
 		res.raise_for_status();
 		return res.json();
 
 	def update_server(self, name, ip, port):
 		if self.token is None:
 			return -1;
-		res = requests.get(f"""{self.auth_server}/servers/update?token={self.token}&ip={ip}&port={port}&name={name}""");
+		headers = {
+			"Authorization": self.token
+		};
+		print(self.token);
+		res = requests.get(f"""{self.auth_server}/servers/update?ip={ip}&port={port}&name={name}""", headers=headers);
 		res.raise_for_status();
 		return res.json();
 
@@ -41,7 +68,7 @@ class APIClient(APIServer):
 		res.raise_for_status();
 		return res.json();
 
-	def get_servers(self, name):
+	def get_servers(self):
 		res = requests.get(f"""{self.auth_server}/servers""");
 		res.raise_for_status();
 		return res.json();
@@ -57,7 +84,7 @@ class APIClient(APIServer):
 		code = 200;
 		query = parse_qs(urlparse(self.path).query);
 
-		self.server_version = "MCPI API";
+		self.server_version = "MCPI-Central API";
 		self.sys_version = "";
 
 		if self.path[:11] == "/auth?code=" and self.require_args(["code"], query):
@@ -76,15 +103,3 @@ class APIClient(APIServer):
 		self.wfile.write(reply.encode());
 		self.wfile.write("\n".encode());
 		return 0;
-
-def main():
-	client = APIClient();
-	client.login();
-	client.new_server("StevePi", "127.0.0.1", 19132);
-	print(client.get_server("StevePi"));
-	client.update_server("StevePi", "127.0.1.1", 19139);
-	print(client.get_server("StevePi"));
-	return 0;
-
-if __name__ == '__main__':
-	sys.exit(main());
