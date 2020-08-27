@@ -23,15 +23,12 @@ The client API exposes the following methods through the `APIClient` class:
 
 Listens to `http://localhost:19140`, waits for a Discord OAuth callback and exchanges the `code` for the `token`. You can generate this callback by opening [this link](https://discord.com/oauth2/authorize?client_id=744320103566540912&redirect_uri=http%3A%2F%2Flocalhost%3A19140%2Fauth&response_type=code&scope=identify%20email), logging-in and authorizing the app in a web browser.
 
-
 ### `def new_server(name, ip, port)`
 | Authentication required |                             Endpoint                         | Method  |   Query parameters   |
 | :---------------------: | :----------------------------------------------------------: | :-----: | :------------------: |
 |   :heavy_check_mark:    | [/servers/new](https://mcpi-devs.herokuapp.com/servers/new)  | **GET** | `name`, `ip`, `port` |
 
 Adds a new server to the database. The server should not already exist, to update a server information, use `update_server`.
-
-Endpoint: https://mcpi-devs.herokuapp.com/servers/new
 
 ### `def update_server(name, ip, port)`
 | Authentication required |                                Endpoint                            | Method  |   Query parameters   |
