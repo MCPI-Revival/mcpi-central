@@ -13,6 +13,15 @@ cd mcpi-central
 pip3 install .
 ```
 
+You can also install these from the Packagecloud Debian repository:
+```shell
+# If you didn't add the repository yet
+curl -s https://packagecloud.io/install/repositories/Alvarito050506/mcpi-devs/script.deb.sh | sudo bash
+
+# Now the actual installation
+sudo apt-get install mcpi-central
+```
+
 ## API
 The client API exposes the following methods through the `APIClient` class:
 

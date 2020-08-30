@@ -1,3 +1,7 @@
 # Python stuff
 *.pyc
 __pycache__/
+
+# Debian
+mcpi-central_*-*.deb
+deb/
