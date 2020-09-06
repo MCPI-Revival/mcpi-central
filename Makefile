@@ -25,7 +25,7 @@ pack:
 	mkdir -p ./deb/DEBIAN/
 	cp -a ./src/. ./deb/usr/lib/python3/dist-packages/mcpicentral
 	@echo "Package: mcpi-central" > ./deb/DEBIAN/control
-	@echo "Version: 0.2.0" >> ./deb/DEBIAN/control
+	@echo "Version: 0.2.1" >> ./deb/DEBIAN/control
 	@echo "Priority: optional" >> ./deb/DEBIAN/control
 	@echo "Architecture: armhf" >> ./deb/DEBIAN/control
 	@echo "Depends: python3" >> ./deb/DEBIAN/control
@@ -34,7 +34,7 @@ pack:
 	@echo "Vcs-Browser: https://github.com/MCPI-Devs/mcpi-central" >> ./deb/DEBIAN/control
 	@echo "Vcs-Git: https://github.com/MCPI-Devs/mcpi-central.git" >> ./deb/DEBIAN/control
 	@echo "Description: MCPI centralized API.\n" >> ./deb/DEBIAN/control
-	dpkg-deb -b ./deb/ ./mcpi-central_0.2.0-1.deb
+	dpkg-deb -b ./deb/ ./mcpi-central_0.2.1-1.deb
 
 clean:
 	rm -rf ./deb/
