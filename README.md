@@ -1,9 +1,9 @@
 # MCPI-Central
-Minecraft Pi centralized API.
+A Minecraft Pi centralized API.
 
 ## Getting started
 ### Prerequisites
-To use the API you need to have `Python >= 3.7.x` pre-installed.
+To use the API you need to have `Python >= 3.7.x` installed on your pi.
 
 ### Installation
 To install the API server and client, download or clone the repository and install the Python 3.x module using `pip`:
@@ -61,10 +61,10 @@ Returns the information of an existing server in the database.
 Returns the names of the first 50 servers in the database.
 
 ## FAQ
-### Where can I find an usage example?
+### Where can I find an example of this in action?
 There is a [`test.py`](https://github.com/MCPI-Devs/mcpi-central/blob/master/src/test.py) in the [`src`](https://github.com/MCPI-Devs/mcpi-central/tree/master/src) folder. It contains a basic usage example.
 
-### Why the `login` function doesn't open a web browser directly?
+### Why doesn't the `login` function open a web browser directly?
 Because some developers could want to use custom methods to open the authorization page, like WebViews.
 
 ## Licensing
