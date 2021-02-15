@@ -32,7 +32,7 @@ class DBData:
 
 	def setup(self):
 		self.cur.execute("CREATE TABLE IF NOT EXISTS servers (name VARCHAR(64) NOT NULL, ip TEXT NOT NULL, port SMALLINT NOT NULL CHECK (port > 0), owner VARCHAR(64) NOT NULL, PRIMARY KEY (name));");
-		self.cur.execute("CREATE TABLE IF NOT EXISTS users (username VARCHAR(64) NOT NULL, email VARCHAR(64) NOT NULL, admin BOOLEAN DEFAULT 0, PRIMARY KEY (username));")
+		self.cur.execute("CREATE TABLE IF NOT EXISTS users (username VARCHAR(64) NOT NULL, email VARCHAR(64) NOT NULL, admin BOOLEAN DEFAULT FALSE, PRIMARY KEY (username));")
 		self.conn.commit();
 		return 0;
 
