@@ -33,7 +33,7 @@ from .base import *
 class APIClient(APIBaseServer):
 	def __init__(self, auth_server):
 		self.__err = """{\n\t"error": "Not found."\n}""";
-		self.token = None;
+		self.token = AuthServer.getToken();
 		self.stop = False;
 		self.auth_server = auth_server or "https://mcpi-devs.herokuapp.com";
 
@@ -73,12 +73,60 @@ class APIClient(APIBaseServer):
 		res.raise_for_status();
 		return res.json();
 
-	def login(self):
-		server = http.HTTPServer(("0.0.0.0", 19140), self);
+	# def start_authserver(self):
+	# 	server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT")), self))
+	# 	server.timeout = 1;
+	# 	while not self.stop:
+	# 		server.handle_request();
+	# 	return 0;
+	#
+	# def do_GET(self):
+	# 	code = 200;
+	# 	query = parse_qs(urlparse(self.path).query);
+	#
+	# 	self.server_version = "MCPI-Central API";
+	# 	self.sys_version = "";
+	#
+	# 	if self.path[:11] == "/auth?code=" and self.require_args(["code"], query):
+	# 		token = self.get_token(query["code"][0]);
+	# 		reply = "You can now close this window.";
+	# 		self.token = token["token"];
+	# 		self.stop = True;
+	# 		res = requests.get(f"""{self.auth_server}/registertoken?token={self.token}""");
+	# 		res.raise_for_status()
+	# 	else:
+	# 		reply = self.__err;
+	# 		code = 404;
+	#
+	# 	self.send_response(code);
+	# 	self.send_header("Content-Type", "text/html");
+	# 	self.end_headers();
+	#
+	# 	self.wfile.write(reply.encode());
+	# 	self.wfile.write("\n".encode());
+	# 	return 0;
+
+class AuthServer(APIBaseServer):
+	def __init__(self, auth_server):
+		self.__err = """{\n\t"error": "Not found."\n}""";
+		self.token = None;
+		self.stop = False;
+		self.auth_server = auth_server or "https://mcpi-devs.herokuapp.com";
+
+	def get_token(self, code):
+		res = requests.get(f"""{self.auth_server}/auth?code={code}""");
+		res.raise_for_status();
+		return res.json();
+
+	def start_authserver(self):
+		server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT")), self))
 		server.timeout = 1;
 		while not self.stop:
 			server.handle_request();
 		return 0;
+
+	def getToken(self):
+		return self.token
 
 	def do_GET(self):
 		code = 200;
@@ -92,6 +140,8 @@ class APIClient(APIBaseServer):
 			reply = "You can now close this window.";
 			self.token = token["token"];
 			self.stop = True;
+			res = requests.get(f"""{self.auth_server}/registertoken?token={self.token}""");
+			res.raise_for_status()
 		else:
 			reply = self.__err;
 			code = 404;
