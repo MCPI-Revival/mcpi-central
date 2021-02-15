@@ -35,7 +35,7 @@ class APIClient(APIBaseServer):
 		self.__err = """{\n\t"error": "Not found."\n}""";
 		self.token = None;
 		self.stop = False;
-		self.auth_server = auth_server or "https://mcpi-devs.herokuapp.com";
+		self.auth_server = auth_server or "https://mcpi-central.herokuapp.com";
 
 	def get_token(self, code):
 		res = requests.get(f"""{self.auth_server}/auth?code={code}""");
@@ -87,7 +87,7 @@ class APIClient(APIBaseServer):
 		self.server_version = "MCPI-Central API";
 		self.sys_version = "";
 
-		if self.path[:11] == "/auth?code=" and self.require_args(["code"], query):
+		if self.path[:11] == "/callback_auth?code=" and self.require_args(["code"], query):
 			token = self.get_token(query["code"][0]);
 			reply = "You can now close this window.";
 			self.token = token["token"];

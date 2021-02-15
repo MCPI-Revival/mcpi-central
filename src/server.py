@@ -102,6 +102,11 @@ class APIServer(APIBaseServer):
 				reply = self.encode_json({
 					"token": self.get_token(query["code"][0])["access_token"]
 				});
+			# elif url.path[:20] == "/callback_auth?code=" and self.require_args(["code"], query):
+			# 	token = self.get_token(query["code"][0]);
+			# 	reply = "You can now close this window.";
+			#elif url.path == "/register":
+
 			elif url.path == "/user":
 				reply = self.encode_json(self.get_user(token));
 			elif url.path == "/servers/new":
