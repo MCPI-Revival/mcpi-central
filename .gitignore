@@ -1,6 +1,7 @@
 # Python stuff
 *.pyc
 __pycache__/
+venv/
 
 # Debian
 mcpi-central_*-*.deb

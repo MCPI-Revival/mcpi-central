@@ -32,19 +32,19 @@ class DBData:
 
 	def setup(self):
 		self.cur.execute("CREATE TABLE IF NOT EXISTS servers (name VARCHAR(64) NOT NULL, ip TEXT NOT NULL, port SMALLINT NOT NULL CHECK (port > 0), owner VARCHAR(64) NOT NULL, PRIMARY KEY (name));");
-		self.cur.execute("CREATE TABLE IF NOT EXISTS users (username VARCHAR(64) NOT NULL, email VARCHAR(64) NOT NULL, PRIMARY KEY (username));")
+		self.cur.execute("CREATE TABLE IF NOT EXISTS users (username VARCHAR(64) NOT NULL, email VARCHAR(64) NOT NULL, admin TINYINT(1) DEFAULT 0, PRIMARY KEY (username));")
 		self.conn.commit();
 		return 0;
 
 	def add_server(self, name, ip, port, owner):
-		if not (len(name) < 64 and len(owner) < 64 and port > 0 and port < 32767):
+		if not (len(name) < 64 and len(owner) < 64 and 0 < port < 32767):
 			return -1;
 		self.cur.execute("INSERT INTO servers (name, ip, port, owner) VALUES (%s, %s, %s, %s);", (name, ip, port, owner));
 		self.conn.commit();
 		return 0;
 
 	def update_server(self, name, ip, port):
-		if not (port > 0 and port < 32767):
+		if not (0 < port < 32767):
 			return -1;
 		self.cur.execute("UPDATE servers SET ip=%s, port=%s WHERE name=%s;", (ip, port, name));
 		self.conn.commit();
@@ -57,6 +57,19 @@ class DBData:
 	def get_servers(self):
 		self.cur.execute("SELECT name FROM servers LIMIT 50;");
 		return self.cur.fetchall();
+
+	def register_user(self, username, email, admin):
+		self.cur.execute("INSERT INTO users (username, email) VALUES (%s, %s, %d);", (username, email, admin))
+		self.conn.commit()
+		return 0
+
+	def get_user(self, email):
+		self.cur.execute("SELECT * FROM users WHERE email = %s;", (email,))
+		return self.cur.fetchone()
+
+	def check_admin(self, email):
+		self.cur.execute("SELECT admin FROM users WHERE email = %s;", (email,))
+		return self.cur.fetchone()
 
 	def close(self):
 		self.cur.close();
