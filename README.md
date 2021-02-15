@@ -30,7 +30,7 @@ The client API exposes the following methods through the `APIClient` class:
 | :---------------------: | :--------------------------------------------: | :-----: | :--------------: |
 |           :x:           | [/auth](https://mcpi-devs.herokuapp.com/auth)  | **GET** |      `code`      |
 
-Listens to `http://localhost:19140`, waits for a Discord OAuth callback and exchanges the `code` for the `token`. You can generate this callback by opening [this link](https://discord.com/oauth2/authorize?client_id=744320103566540912&redirect_uri=http%3A%2F%2Flocalhost%3A19140%2Fauth&response_type=code&scope=identify%20email), logging-in and authorizing the app in a web browser.
+Listens to `http://localhost/callback`, waits for a Discord OAuth callback and exchanges the `code` for the `token`. You can generate this callback by opening [this link](https://discord.com/api/oauth2/authorize?client_id=810952498168332288&redirect_uri=https%3A%2F%2Fmcpi-central.herokuapp.com%2Fcallback&response_type=code&scope=identify%20email), logging-in and authorizing the app in a web browser.
 
 ### `def new_server(name, ip, port)`
 | Authentication required |                             Endpoint                         | Method  |   Query parameters   |
