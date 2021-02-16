@@ -25,5 +25,6 @@ from mcpicentral import *
 from mcpicentral import AuthServer
 
 if __name__ == '__main__':
+    aS = AuthServer()
 	#sys.exit(server.mcpi_central_server(environ.get("CLIENT_ID"), environ.get("CLIENT_SECRET"), environ.get("AUTH_CLIENT"), environ.get("DATABASE_URL")));
-    sys.exit(AuthServer.start_authserver())
+    sys.exit(aS.start_authserver())
