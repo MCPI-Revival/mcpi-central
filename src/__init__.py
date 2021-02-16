@@ -23,4 +23,4 @@
 
 from .base import *
 from .client import *
-from .client import AuthServer
+from .authserver import *

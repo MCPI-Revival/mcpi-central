@@ -29,11 +29,11 @@ setup(
 	description="MCPI centralized API.",
 	author="Alvarito050506",
 	author_email="donfrutosgomez@gmail.com",
-	url="https://github.com/MCPI-Devs/mcpi-central",
+	url="https://github.com/MCPI-Revived/mcpi-central",
 	project_urls={
-		"Bug Tracker": "https://github.com/MCPI-Devs/mcpi-central/issues",
-		"Documentation": "https://github.com/MCPI-Devs/mcpi-central#readme",
-		"Source Code": "https://github.com/MCPI-Devs/mcpi-central",
+		"Bug Tracker": "https://github.com/MCPI-Revival/mcpi-central/issues",
+		"Documentation": "https://github.com/MCPI-Revival/mcpi-central#readme",
+		"Source Code": "https://github.com/MCPI-Revival/mcpi-central",
 	},
 	packages=["mcpicentral"],
 	package_dir={

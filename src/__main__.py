@@ -22,7 +22,7 @@
 #  
 
 from mcpicentral import *
-from .client import AuthServer
+from mcpicentral import AuthServer
 
 if __name__ == '__main__':
 	#sys.exit(server.mcpi_central_server(environ.get("CLIENT_ID"), environ.get("CLIENT_SECRET"), environ.get("AUTH_CLIENT"), environ.get("DATABASE_URL")));
