@@ -29,6 +29,7 @@ import requests
 from os import environ
 from urllib.parse import urlparse, parse_qs
 from .base import *
+import uuid
 
 
 class AuthServer(APIBaseServer):
@@ -43,12 +44,6 @@ class AuthServer(APIBaseServer):
         res.raise_for_status();
         return res.json();
 
-    def start_authserver(self):
-        server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT")), self))
-        server.timeout = 1;
-        while not self.stop:
-            server.handle_request();
-        return 0;
 
     def getToken(self):
         return self.token
@@ -64,9 +59,13 @@ class AuthServer(APIBaseServer):
             token = self.get_token(query["code"][0]);
             reply = "You can now close this window.";
             self.token = token["token"];
-            self.stop = True;
-            res = requests.get(f"""{self.auth_server}/registertoken?token={self.token}""");
-            res.raise_for_status()
+            #self.stop = True;
+            self.uuid = uuid.uuid4().hex
+            # res = requests.get(f"""{self.auth_server}/registertoken?token={self.token}""");
+            # res.raise_for_status()
+        elif self.path == "/gettoken" and self.require_args(["uuid"], query):
+            if query["uuid"][0] == uuid:
+                reply = self.token
         else:
             reply = self.__err;
             code = 404;
@@ -78,3 +77,12 @@ class AuthServer(APIBaseServer):
         self.wfile.write(reply.encode());
         self.wfile.write("\n".encode());
         return 0;
+
+
+def start_authserver():
+    aS = AuthServer("https://mcpi-central.herokuapp.com/")
+    server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT")), aS))
+    server.timeout = 1;
+    while not aS.stop:
+        server.handle_request();
+    return 0;
