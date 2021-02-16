@@ -84,5 +84,5 @@ def start_authserver():
     server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT")), aS))
     server.timeout = 1;
     while not aS.stop:
-        server.handle_request();
+        server.serve_forever();
     return 0;
