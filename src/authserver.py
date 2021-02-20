@@ -81,7 +81,7 @@ class AuthServer(APIBaseServer):
 
 def start_authserver():
     aS = AuthServer("https://mcpi-central.herokuapp.com/")
-    server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT")), aS))
+    server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT"))), aS)
     server.timeout = 1;
     while not aS.stop:
         server.serve_forever();
