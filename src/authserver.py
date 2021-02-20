@@ -60,11 +60,17 @@ class AuthServer(APIBaseServer):
             reply = "You can now close this window.";
             self.token = token["token"];
             #self.stop = True;
-            self.uuid = uuid.uuid4().hex
+
+            headers = {
+                "Authorization": f"Bearer {token}"
+            };
+            res = requests.get("https://discord.com/api/v6/users/@me", headers=headers);
+            res.raise_for_status();
+            self.email = res.json()["email"]
             # res = requests.get(f"""{self.auth_server}/registertoken?token={self.token}""");
             # res.raise_for_status()
-        elif self.path == "/gettoken" and self.require_args(["uuid"], query):
-            if query["uuid"][0] == uuid:
+        elif self.path == "/gettoken" and self.require_args(["email"], query):
+            if query["email"][0] == self.email:
                 reply = self.token
         else:
             reply = self.__err;
