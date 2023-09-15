@@ -21,12 +21,14 @@
 #  
 #  
 
+import redis
 import psycopg2
 import psycopg2.extras
 from os import environ
 
 class DBData:
-	def __init__(self, url):
+	def __init__(self, url, redis_url):
+		self.redis = redis.from_url(redis_url);
 		self.conn = psycopg2.connect(url, sslmode="require");
 		self.cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor);
 
@@ -40,6 +42,9 @@ class DBData:
 			return -1;
 		self.cur.execute("INSERT INTO servers (name, ip, port, owner) VALUES (%s, %s, %s, %s);", (name, ip, port, owner));
 		self.conn.commit();
+		self.redis.hset(name, "ip", ip);
+		self.redis.hset(name, "port", port);
+		self.redis.hset(name, "owner", owner);
 		return 0;
 
 	def update_server(self, name, ip, port):
@@ -47,11 +52,26 @@ class DBData:
 			return -1;
 		self.cur.execute("UPDATE servers SET ip=%s, port=%s WHERE name=%s;", (ip, port, name));
 		self.conn.commit();
+		self.redis.hset(name, "ip", ip);
+		self.redis.hset(name, "port", port);
+		self.redis.hset(name, "owner", owner);
 		return 0;
 
 	def get_server(self, name):
+		ip = self.redis.hget(name, "ip");
+		if ip != None:
+			return {
+				"ip": ip.decode("utf-8"),
+				"owner": self.redis.hget(name, "owner").decode("utf-8"),
+				"port": int(self.redis.hget(name, "port").decode("utf-8")),
+				"name": name
+			};
 		self.cur.execute("SELECT * FROM servers WHERE name = %s;", (name,));
-		return self.cur.fetchone();
+		data = self.cur.fetchone();
+		self.redis.hset(name, "ip", data["ip"]);
+		self.redis.hset(name, "port", data["port"]);
+		self.redis.hset(name, "owner", data["owner"]);
+		return data;
 
 	def get_servers(self):
 		self.cur.execute("SELECT name FROM servers LIMIT 50;");

@@ -21,8 +21,15 @@
 #  
 #  
 
-from mcpicentral import *
+import sys
+from os import environ
 from mcpicentral import server
 
-if __name__ == '__main__':
-	sys.exit(server.mcpi_central_server(environ.get("CLIENT_ID"), environ.get("CLIENT_SECRET"), environ.get("AUTH_CLIENT"), environ.get("DATABASE_URL")));
+if __name__ == "__main__":
+	sys.exit(server.mcpi_central_server(
+		environ.get("CLIENT_ID"),
+		environ.get("CLIENT_SECRET"),
+		environ.get("AUTH_CLIENT"),
+		environ.get("DATABASE_URL"),
+		environ.get("REDIS_URL")
+	));

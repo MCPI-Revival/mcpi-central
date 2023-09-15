@@ -32,9 +32,9 @@ from .db import *
 from .base import *
 
 class APIServer(APIBaseServer):
-	def __init__(self, id, secret, client, db_url):
+	def __init__(self, id, secret, client, db_url, redis_url):
 		self.__err = """{\n\t"error": "Not found."\n}""";
-		self.db = DBData(db_url);
+		self.db = DBData(db_url, redis_url);
 		self.db.setup();
 		self.paths = {
 			"/auth": ["code"],
@@ -157,8 +157,8 @@ class APIServer(APIBaseServer):
 		self.wfile.write("\n".encode());
 		return 0;
 
-def mcpi_central_server(id, secret, client, db_url):
-	handler = APIServer(id, secret, client, db_url);
+def mcpi_central_server(id, secret, client, db_url, redis_url):
+	handler = APIServer(id, secret, client, db_url, redis_url);
 	server = http.HTTPServer(("0.0.0.0", int(environ.get("PORT"))), handler);
 	try:
 		server.serve_forever();
